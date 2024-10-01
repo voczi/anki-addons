@@ -26,10 +26,7 @@ def dirty_hook():
 
 def dirty_add_note(self: Collection, note: Note, deck_id: DeckId) -> OpChanges:
     ret: OpChanges = Collection._add_note(self, note, deck_id)
-    
-    if currentBrowser is not None and not sip.isdeleted(currentBrowser):
-        mw.taskman.run_on_main(lambda: new_note(note))
-        
+    mw.taskman.run_on_main(lambda: new_note(note))
     return ret
 
 def new_note(note: Note):
