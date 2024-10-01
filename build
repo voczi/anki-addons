@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+echo Building addon: Auto-refresh browser
+(cd addon-browser-refresh; zip -FSr -0 ../packaged/addon-browser-refresh.ankiaddon ./)

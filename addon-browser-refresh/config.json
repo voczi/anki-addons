@@ -1,1 +1,5 @@
-{"enable_refresh": "True", "auto_select": "True"}
+{
+    "enable_refresh": "True",
+    "auto_select": "True",
+    "dirty_hook": "False"
+}
