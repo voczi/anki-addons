@@ -18,7 +18,7 @@ class ConfigDialog(QDialog):
         autoSelect.setChecked(config.getAutoSelect())
         
         dirtyHook = QCheckBox("Enable dirty hook", self)
-        dirtyHook.toolTip = "Used for compatability with third party plugins (e.g., AnkiConnect). Proceed with caution."
+        dirtyHook.setToolTip("Used for compatability with third party plugins (e.g., AnkiConnect). Proceed with caution.")
         dirtyHook.stateChanged.connect(config.setDirtyHook)
         dirtyHook.setChecked(config.getDirtyHook())
 
