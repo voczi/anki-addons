@@ -7,42 +7,50 @@ from anki.decks import DeckId
 from .ui.config import ConfigDialog
 from .model.config import AddonConfig
 from anki.collection import Collection, OpChanges
-from aqt.operations import QueryOp
 
 config = AddonConfig(__name__)
-currentBrowser: Browser = None
+currentBrowsers: set[Browser] = set()
 
 def openConfig():
     configDialog = ConfigDialog(config)
     configDialog.exec()
 
 def browser_init(browser: Browser):
-    global currentBrowser
-    currentBrowser = browser
+    global currentBrowsers
+    currentBrowsers.add(browser)
     
-def dirty_hook():
-    Collection._add_note = Collection.add_note
-    Collection.add_note = dirty_add_note
+def setup_hooks():
+    # TODO Restore original functions after user disables the addon
 
-def dirty_add_note(self: Collection, note: Note, deck_id: DeckId) -> OpChanges:
+    Collection._add_note = Collection.add_note
+    Collection.add_note = on_add_note
+
+def on_add_note(self: Collection, note: Note, deck_id: DeckId) -> OpChanges:
     ret: OpChanges = Collection._add_note(self, note, deck_id)
     mw.taskman.run_on_main(lambda: new_note(note))
     return ret
 
 def new_note(note: Note):
-    if currentBrowser is not None and not sip.isdeleted(currentBrowser):
+    global currentBrowsers
+
+    deletedBrowsers: set[Browser] = set()
+    
+    for currentBrowser in currentBrowsers:
+        if currentBrowser is None or sip.isdeleted(currentBrowser):
+            deletedBrowsers.add(currentBrowser)
+            continue
+        
         if config.getAutoRefresh():
             currentBrowser.search()
-            
-            if config.getAutoSelect() and note.id in currentBrowser.table._model._items:
-                cards = note.card_ids()
-                if len(cards) > 0:
-                    currentBrowser.table.select_single_card(cards[0])
+                
+        if config.getAutoSelect() and note.id in currentBrowser.table._model._items:
+            cards = note.card_ids()
+            if len(cards) > 0:
+                currentBrowser.table.select_single_card(cards[0])
+    
+    currentBrowsers = currentBrowsers.difference(deletedBrowsers)
     
 mw.addonManager.setConfigAction(__name__, openConfig)
 
 gui_hooks.browser_menus_did_init.append(browser_init)
-if not config.getDirtyHook():
-    gui_hooks.add_cards_did_add_note.append(new_note)
-else:
-    dirty_hook()
+setup_hooks()

@@ -7,7 +7,7 @@ class AddonConfig():
         self._initConfig()
     
     def _initConfig(self):
-        configDefaults = { "enable_refresh": "True", "auto_select": "True", "dirty_hook": "False" }
+        configDefaults = { "enable_refresh": "True", "auto_select": "True" }
         
         self._ankiConfig = mw.addonManager.getConfig(self._moduleName)
         for config_name, config_default in configDefaults.items():
@@ -31,12 +31,5 @@ class AddonConfig():
     
     def setAutoSelect(self, value: bool):
         self._ankiConfig["auto_select"] = str(value == 2)
-        self._saveConfig()
-        
-    def getDirtyHook(self) -> bool:
-        return self._ankiConfig["dirty_hook"] == "True"
-    
-    def setDirtyHook(self, value: bool):
-        self._ankiConfig["dirty_hook"] = str(value == 2)
         self._saveConfig()
     

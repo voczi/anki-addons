@@ -16,14 +16,8 @@ class ConfigDialog(QDialog):
         autoSelect = QCheckBox("Auto-select new cards", self)
         autoSelect.stateChanged.connect(config.setAutoSelect)
         autoSelect.setChecked(config.getAutoSelect())
-        
-        dirtyHook = QCheckBox("Enable dirty hook", self)
-        dirtyHook.setToolTip("Used for compatability with third party plugins (e.g., AnkiConnect). Proceed with caution.")
-        dirtyHook.stateChanged.connect(config.setDirtyHook)
-        dirtyHook.setChecked(config.getDirtyHook())
 
         layout.addWidget(autoRefresh)
         layout.addWidget(autoSelect)
-        layout.addWidget(dirtyHook)
         
         self.setLayout(layout)
